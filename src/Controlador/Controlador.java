@@ -218,6 +218,7 @@ public class Controlador {
                 ArrayList<Integer> cantidades = new ArrayList<>();
 
                 boolean agregarMas = true;
+                boolean cancelarFactura = false;
 
                 while (agregarMas) {
 
@@ -237,7 +238,10 @@ public class Controlador {
                         int seleccion = vista.leerOpcionMenu(1, 2);
 
                         if (seleccion == 1) continue;
-                        else break;
+                        else {
+                            cancelarFactura = true;
+                            break;
+                        }
 
                     } else {
                         productos.add(producto);
@@ -256,8 +260,13 @@ public class Controlador {
                     }
                 }
 
-                System.out.println("Introduzca fecha");
+                // Si se canceló la factura, volvemos al menú directamente
+                if (cancelarFactura || productos.isEmpty()) {
+                    System.out.println("Creación de factura cancelada. Volviendo al menú...");
+                    continue; // Vuelve al inicio del bucle 'do...while'
+                }
 
+                System.out.println("Introduzca fecha:");
                 String fecha = vista.leerFecha();
 
                 modelo.generarFactura(fecha, clienteSeleccionado, productos, cantidades);
@@ -267,4 +276,5 @@ public class Controlador {
 
         } while (salidaCreacionFacturas);
     }
+
 }

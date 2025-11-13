@@ -71,7 +71,7 @@ public class Modelo {
         String precioFormateado = String.format("%.2f", precioInstancia); // "12.50"
 
         try (BufferedWriter writer = new BufferedWriter(new FileWriter("articulos.txt", true))) {
-            // La opción 'true' en FileWriter es para añadir al fichero sin borrar lo anterior
+
             writer.write(articulo.getCodigoArticulo() + ";" + nombre + ";" + precioFormateado);
             writer.newLine(); // NUEVA LINEA PARA CADA CLIENTE
             System.out.println("Artículo agregado correctamente");
@@ -271,6 +271,7 @@ public class Modelo {
         } catch (IOException e) {
             System.out.println("Error leyendo artículos: " + e.getMessage());
         }
+
     }
 
     public List<Cliente> getClientesList() {

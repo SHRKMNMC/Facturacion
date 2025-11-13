@@ -243,7 +243,7 @@ public class Vista {
     public void mostrarFicheroLineasFacturas() {
 
         System.out.println("======= Lineas guardadas =======");
-        try (BufferedReader reader = new BufferedReader(new FileReader("lineas_facturas.txt"))) {
+        try (BufferedReader reader = new BufferedReader(new FileReader("lineas_factura.txt"))) {
             String linea;
             while ((linea = reader.readLine()) != null) {
                 System.out.println(linea);
