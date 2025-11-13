@@ -45,8 +45,6 @@ public class Modelo {
         } catch (IOException e) {
             System.out.println("Error al guardar el cliente: " + e.getMessage());
         }
-
-
     }
 
     public void generarArtículo(String nombre, String precio){
@@ -69,9 +67,12 @@ public class Modelo {
         articulosList.add(articulo);
 
         // Guarda en fichero
+
+        String precioFormateado = String.format("%.2f", precioInstancia); // "12.50"
+
         try (BufferedWriter writer = new BufferedWriter(new FileWriter("articulos.txt", true))) {
             // La opción 'true' en FileWriter es para añadir al fichero sin borrar lo anterior
-            writer.write(articulo.getCodigoArticulo() + ";" + nombre + ";" + precio);
+            writer.write(articulo.getCodigoArticulo() + ";" + nombre + ";" + precioFormateado);
             writer.newLine(); // NUEVA LINEA PARA CADA CLIENTE
             System.out.println("Artículo agregado correctamente");
         } catch (IOException e) {
@@ -79,9 +80,80 @@ public class Modelo {
         }
     }
 
-    public void generarLineaFactura(String nombre,int cantidad){
-        System.out.println("POR ACABAR");
+    public void generarFactura(String fecha, String dniCliente,
+                               ArrayList<String> productos, ArrayList<Integer> cantidades) {
 
+        // Obtener cliente
+        Cliente cliente = obtenerCliente(dniCliente);
+        if (cliente == null) {
+            System.out.println("No se puede generar la factura. Cliente no encontrado.");
+            return;
+        }
+
+        // Crear instancia de factura
+        Factura factura = new Factura(fecha, cliente);
+
+        // Crear líneas de factura (máximo 10)
+        ArrayList<LineaFacturas> lineas = new ArrayList<>();
+        for (int i = 0; i < productos.size() && i < 10; i++) {
+            String nombreProducto = productos.get(i);
+            int cantidad = cantidades.get(i);
+
+            Articulo articulo = obtenerArticulo(nombreProducto);
+            if (articulo != null) {
+                LineaFacturas linea = new LineaFacturas(articulo, cantidad);
+                factura.agregarLineaFactura(linea);
+                lineas.add(linea);  // Para escribir en archivo separado
+            } else {
+                System.out.println("El producto '" + nombreProducto + "' no se encontró en el sistema.");
+            }
+        }
+
+        // Guardar info general en facturas.txt
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter("facturas.txt", true))) {
+            writer.write(factura.getNumeroFactura() + ";" + fecha + ";" + cliente.getNombre() + ";" + cliente.getDni() +";"+factura.getIva());
+            writer.newLine();
+        } catch (IOException e) {
+            System.out.println("Error al guardar la factura: " + e.getMessage());
+        }
+
+        // Guardar info detallada en lineas_factura.txt
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter("lineas_factura.txt", true))) {
+            for (LineaFacturas linea : lineas) {
+                Articulo art = linea.getArticulo();
+                // Guardamos código de factura para relacionarlo
+                writer.write(factura.getNumeroFactura() + ";" + art.getCodigoArticulo() + ";" + art.getNombre() + ";" +
+                        linea.getCantidadArtículo() + ";" + linea.calcularCantidadPrecio());
+                writer.newLine();
+            }
+        } catch (IOException e) {
+            System.out.println("Error al guardar las líneas de la factura: " + e.getMessage());
+        }
+
+        factura.MostrarInfo();
+        System.out.println("Factura y líneas guardadas correctamente.");
+    }
+
+    public Articulo obtenerArticulo(String nombreArticulo) {
+        for (Articulo a : articulosList) {
+            if (a.getNombre().equals(nombreArticulo)) {
+                System.out.println("Artículo encontrado");
+                return a;
+            }
+        }
+        System.out.println("Artículo no encontrado");
+        return null;
+    }
+
+    public Cliente obtenerCliente(String dniCliente) {
+        for (Cliente c : clientesList) {
+            if (c.getDni().equals(dniCliente)) {
+                System.out.println("Cliente encontrado");
+                return c;
+            }
+        }
+        System.out.println("Cliente no encontrado");
+        return null;
     }
 
     //MÉTODOS PARA CONSULTAS
@@ -110,17 +182,42 @@ public class Modelo {
         for (Articulo a : articulosList) {
             if (a.getNombre().equals(nombreArticulo)) {
                 System.out.println("Artículo encontrado");
-                String precioString = String.valueOf(a.getPrecio());
+                String precioFormateado = String.format("%.2f", a.getPrecio()); // "12.50"
+
                 // Devolvemos un array con todos los datos
                 return new String[] {
                         a.getNombre(),
-                        precioString
+                        precioFormateado
                 };
             }
         }
         System.out.println("Artículo no encontrado");
         return null; // Retornamos null si no se encuentra
     }
+
+    public String[] consultarFacturas(String numeroFactura) {
+        int facturaConsultada = Integer.parseInt(numeroFactura);
+        for (Factura f : facturasList) {
+            if (f.getNumeroFactura() == facturaConsultada) {
+                System.out.println("Artículo encontrado");
+                // Devolvemos un array con todos los datos
+                String numeroConsultado = String.valueOf(f.getNumeroFactura());
+                String ivaConsultado = String.valueOf(f.getIva());
+                String precioConsultado = String.valueOf(f.getPrecioFinal());
+                return new String[] {
+                        numeroConsultado,
+                        f.getFecha(),
+                        f.getDniCliente(),
+                        ivaConsultado,
+                        precioConsultado
+                };
+            }
+        }
+        System.out.println("Artículo no encontrado");
+        return null; // Retornamos null si no se encuentra
+    }
+
+
 
     //MÉTODOS AUXILIARES
 
@@ -161,7 +258,7 @@ public class Modelo {
                     String nombre = datos[1].trim();
                     double precio;
                     try {
-                        precio = Double.parseDouble(datos[2].trim());
+                        precio = Double.parseDouble(datos[2].trim().replace(",","."));
                     } catch (NumberFormatException e) {
                         System.out.println("Precio inválido en línea: " + linea);
                         continue; // Saltar línea inválida

@@ -9,14 +9,20 @@ public class Factura {
     private LineaFacturas[] lineasFacturas;
     private int cantidadLineasFacturas = 0;
     private final static int MAX_LINEAS_FACTURAS = 10;
+    private double precioTotal;
+    private int iva;
+    private double precioFinal;
 
     public Factura (String fecha, Cliente cliente){
         this.numeroFactura = numeroFactura;
         numeroFactura++;
         this.fecha = fecha;
+        this.iva = 21;
         this.cliente = cliente;
         this.lineasFacturas = new LineaFacturas[MAX_LINEAS_FACTURAS];
         this.dniCliente = cliente.getDni();
+        this.precioTotal = sumarLineasFacturas();
+        this.precioFinal = calcularPrecioFinal();
     }
 
     public int getNumeroFactura(){
@@ -29,6 +35,39 @@ public class Factura {
 
     public String getDniCliente(){
         return dniCliente;
+    }
+
+    public double getPrecioTotal(){
+        return precioTotal;
+    }
+
+    public double getIva(){
+        return iva;
+    }
+
+    public double getPrecioFinal(){
+        return precioFinal;
+    }
+
+
+
+    public double sumarLineasFacturas(){
+
+        double total = 0;
+
+        for (int i = 0; i < cantidadLineasFacturas; i++) {
+            total = total + lineasFacturas[i].calcularCantidadPrecio();
+        }
+
+        return total;
+
+    }
+
+    public double calcularPrecioFinal(){
+
+        precioFinal = precioTotal + (precioTotal*iva)/100;
+
+        return precioFinal;
     }
 
     public void agregarLineaFactura(LineaFacturas lineaFacturas){

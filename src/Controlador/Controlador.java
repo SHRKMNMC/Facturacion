@@ -85,14 +85,15 @@ public class Controlador {
 
                         vista.menuFacturas();  //MENU FACTURAS
 
-                        seleccionMenuFacturas = vista.leerOpcionMenu(1, 4);
+                        seleccionMenuFacturas = vista.leerOpcionMenu(1, 5);
 
                         switch (seleccionMenuFacturas) {
 
-                            case 1 -> System.out.println("Nueva factura");
+                            case 1 -> crearFactura(); // NUEVA FACTURA
                             case 2 -> System.out.println("Consultar facturas");
-                            case 3 -> System.out.println("Mostrar lista de facturas");//CREAR CLIENTE
-                            case 4 -> {
+                            case 3 -> vista.mostrarFicheroFacturas();
+                            case 4 -> vista.mostrarFicheroLineasFacturas();//CREAR CLIENTE
+                            case 5 -> {
                                 System.out.println("Volviendo...");
                                 salidaMenuArtículos = true;
                             }
@@ -177,14 +178,26 @@ public class Controlador {
         }while (salidaConsultas != 1);
     }
 
+    public void consultarFactura(){
+        int salidaConsultas = 0;
+        do {
+            System.out.println("Introduzca numero de la factura a consultar");
+            String numeroFactura = vista.leerString(0,40);
+            String[] datosConsulta = modelo.consultarFacturas(numeroFactura);
+            vista.mostrarFactura(datosConsulta);
+            System.out.println("Introduzca 1 para salir");
+            salidaConsultas = vista.leerOpcionMenu(1,1);
+        }while (salidaConsultas != 1);
+    }
+
     //MÉTODOS MENÚ FACTURAS POR ACABAR
 
     public void crearFactura() {
 
-        boolean reintentar;
+        boolean salidaCreacionFacturas;
 
         do {
-            reintentar = false; // Reiniciamos en cada iteración
+            salidaCreacionFacturas = false;
 
             System.out.println("Introduzca DNI del cliente: ");
             String clienteSeleccionado = vista.leerString(9, 9);
@@ -195,32 +208,63 @@ public class Controlador {
                 System.out.println("Cliente no encontrado en el sistema, ¿volver a intentar?");
                 System.out.println(" 1. Sí   2. No");
                 int seleccion = vista.leerOpcionMenu(1, 2);
+                if (seleccion == 1) salidaCreacionFacturas = true;
 
-                if (seleccion == 1) {
-                    reintentar = true; // Volver a intentar
-                }
-                // si selecciona 2, reintentar queda false y el bucle termina
             } else {
-                System.out.println("Cliente encontrado: " + consultado[0]); // ejemplo: nombre
-                // Aquí continuarías con la creación de la factura
 
-                int agregarMas = 0;
+                System.out.println("Cliente encontrado: " + consultado[0]);
 
-                while (agregarMas == 1){
+                ArrayList<String> productos = new ArrayList<>();
+                ArrayList<Integer> cantidades = new ArrayList<>();
+
+                boolean agregarMas = true;
+
+                while (agregarMas) {
+
+                    if (productos.size() >= 10) {
+                        System.out.println("No puede agregar más productos. Límite de 10 alcanzado.");
+                        break;
+                    }
 
                     System.out.println("Introduce nombre del producto: ");
-                    String producto = vista.leerString(1,40);
+                    String producto = vista.leerString(1, 40);
 
+                    String[] productoConsultado = modelo.consultarArtículo(producto);
 
+                    if (productoConsultado == null) {
+                        System.out.println("Artículo no encontrado en el sistema, ¿volver a intentar?");
+                        System.out.println(" 1. Sí   2. No");
+                        int seleccion = vista.leerOpcionMenu(1, 2);
 
+                        if (seleccion == 1) continue;
+                        else break;
+
+                    } else {
+                        productos.add(producto);
+
+                        System.out.println("Introduce cantidad del producto:");
+                        int cantidad = vista.leerOpcionMenu(1, 999);
+                        cantidades.add(cantidad);
+
+                        if (productos.size() >= 10) {
+                            System.out.println("Se alcanzó el máximo de 10 productos.");
+                            break;
+                        }
+
+                        System.out.println("¿Agregar otro producto?    1.Sí    2.No");
+                        agregarMas = vista.leerOpcionMenu(1, 2) == 1;
+                    }
                 }
 
+                System.out.println("Introduzca fecha");
 
+                String fecha = vista.leerFecha();
 
+                modelo.generarFactura(fecha, clienteSeleccionado, productos, cantidades);
+
+                System.out.println("Factura creada correctamente.");
             }
 
-        } while (reintentar);
+        } while (salidaCreacionFacturas);
     }
-
-
 }

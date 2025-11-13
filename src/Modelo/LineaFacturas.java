@@ -16,6 +16,14 @@ public class LineaFacturas {
         return cantidadPrecio;
     }
 
+    public Articulo getArticulo(){
+        return articulo;
+    }
+
+    public int getCantidadArtículo(){
+        return cantidadArtículo;
+    }
+
     public void mostrarInfo(){
 
         System.out.println("         "+articulo.getCodigoArticulo()+"          | "+articulo.getNombre()+" |        "+cantidadArtículo+"        |   "+calcularCantidadPrecio()+"   ");

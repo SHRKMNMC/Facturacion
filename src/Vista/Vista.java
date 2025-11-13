@@ -70,7 +70,8 @@ public class Vista {
         System.out.println("            1. Nueva Factura                   ");
         System.out.println("            2. Consultar Facturas              ");
         System.out.println("            3. Lista de Facturas               ");
-        System.out.println("            4. Salir                           ");
+        System.out.println("            4. Lista de Lineas de facturas     ");
+        System.out.println("            5. Salir                           ");
         System.out.println();
         System.out.println("   Introduzca el número de la opción deseada   ");
         System.out.println();
@@ -138,6 +139,42 @@ public class Vista {
         return datos;
     }
 
+    //METODO PARA RECOPILAR DATOS DEL ARTÍCULO
+
+    public String[] datosNuevoArticulo(){
+
+        String[] datos = new String[2];
+
+        int confirmar = 0;
+
+        do {
+
+            //NOMBRE
+            System.out.println("Introduzca nombre del producto:");
+            datos[0] = leerString(1,40);
+
+            //PRECIO
+            System.out.println("Introduzca precio del producto");
+            datos[1] = leerStringToDouble(1,6);
+
+            System.out.println("|||||| Datos introducidos |||||| ");
+            System.out.println("|");
+            System.out.println("|Nombre: "+ datos[0]);
+            System.out.println("|Precio: "+datos[1]);
+            System.out.println("|______________________________");
+            System.out.println("Introduzca 1 para confirmar datos, 2 para repetir");
+
+            confirmar = leerOpcionMenu(1,2);
+
+            if (confirmar == 2){
+                System.out.println("Repitiendo operación...");
+            }
+
+        }while (confirmar !=1);
+
+        return datos;
+    }
+
     //METODO PARA MOSTRAR CLIENTE CONCRETO EN CONSOLA
 
     public void mostrarCliente(String[] datosClienteConsultado) {
@@ -169,40 +206,52 @@ public class Vista {
         System.out.println("================================");
     }
 
-    //METODO PARA RECOPILAR DATOS DEL ARTÍCULO
+    //METODO PARA MOSTRAR LAS FACTURAS GUARDADAS
 
-    public String[] datosNuevoArticulo(){
+    public void mostrarFicheroFacturas() {
 
-        String[] datos = new String[2];
-
-        int confirmar = 0;
-
-        do {
-
-            //NOMBRE
-            System.out.println("Introduzca nombre del producto:");
-            datos[0] = leerString(1,40);
-
-            //PRECIO
-            System.out.println("Introduzca precio del producto");
-            datos[1] = leerStringToDouble(1,6);
-
-            System.out.println("|||||| Datos introducidos |||||| ");
-            System.out.println("|");
-            System.out.println("|Nombre: "+ datos[0]);
-            System.out.println("|DNI: "+datos[1]);
-            System.out.println("|______________________________");
-            System.out.println("Introduzca 1 para confirmar datos, 2 para repetir");
-
-            confirmar = leerOpcionMenu(1,2);
-
-            if (confirmar == 2){
-                System.out.println("Repitiendo operación...");
+        System.out.println("====== Facturas guardadas =======");
+        try (BufferedReader reader = new BufferedReader(new FileReader("facturas.txt"))) {
+            String linea;
+            while ((linea = reader.readLine()) != null) {
+                System.out.println(linea);
             }
+        } catch (IOException e) {
+            System.out.println("Error al leer el fichero: " + e.getMessage());
+        }
+        System.out.println("================================");
+    }
 
-        }while (confirmar !=1);
+    //METODO PARA MOSTRAR FACTURA CONCRETA
 
-        return datos;
+    public void mostrarFactura(String[] datosFacturaConsultada) {
+        if (datosFacturaConsultada == null) {
+            System.out.println("Cliente no encontrado.");
+            return;
+        }
+
+        String[] campos = {"Número", "Fecha", "Cliente", "IVA aplicado", "Precio final"};
+
+        for (int i = 0; i < campos.length; i++) {
+            System.out.println(campos[i] + ": " + datosFacturaConsultada[i]);
+        }
+    }
+
+
+    //METODO PARA MOSTRAR LAS LINEAS DE FACTURA GUARDADAS
+
+    public void mostrarFicheroLineasFacturas() {
+
+        System.out.println("======= Lineas guardadas =======");
+        try (BufferedReader reader = new BufferedReader(new FileReader("lineas_facturas.txt"))) {
+            String linea;
+            while ((linea = reader.readLine()) != null) {
+                System.out.println(linea);
+            }
+        } catch (IOException e) {
+            System.out.println("Error al leer el fichero: " + e.getMessage());
+        }
+        System.out.println("================================");
     }
 
 
@@ -236,7 +285,6 @@ public class Vista {
         }
         System.out.println("================================");
     }
-
 
     //METODO PARA CONTROLAR INPUTS NUMÉRICOS DE LOS MENUS
 
@@ -315,6 +363,51 @@ public class Vista {
             return input;
         }
     }
+
+    public String leerFecha() {
+        int dia = 0, mes = 0, anio = 0;
+
+        while (true) {
+            try {
+                System.out.print("Introduce el día (1-31): ");
+                dia = Integer.parseInt(scanner.nextLine().trim());
+                if (dia < 1 || dia > 31) {
+                    System.out.println("Día inválido. Intente de nuevo.");
+                    continue;
+                }
+
+                System.out.print("Introduce el mes (1-12): ");
+                mes = Integer.parseInt(scanner.nextLine().trim());
+                if (mes < 1 || mes > 12) {
+                    System.out.println("Mes inválido. Intente de nuevo.");
+                    continue;
+                }
+
+                System.out.print("Introduce el año (por ejemplo 2025): ");
+                anio = Integer.parseInt(scanner.nextLine().trim());
+                if (anio < 1900 || anio > 2100) {
+                    System.out.println("Año inválido. Intente de nuevo.");
+                    continue;
+                }
+
+                // Validar que el día sea válido para el mes (sin años bisiestos por simplicidad)
+                if ((mes == 4 || mes == 6 || mes == 9 || mes == 11) && dia > 30) {
+                    System.out.println("El mes seleccionado tiene máximo 30 días. Intente de nuevo.");
+                    continue;
+                } else if (mes == 2 && dia > 29) { // Febrero simplificado
+                    System.out.println("Febrero tiene máximo 29 días. Intente de nuevo.");
+                    continue;
+                }
+
+                //Formateo
+                return String.format("%02d-%02d-%04d", dia, mes, anio);
+
+            } catch (NumberFormatException e) {
+                System.out.println("Entrada inválida, debe ser un número. Intente de nuevo.");
+            }
+        }
+    }
+
 
 }
 
