@@ -1,6 +1,7 @@
 package Modelo;
 
 import java.io.*;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,7 +28,7 @@ public class Modelo {
 
         if (existe) {
             System.out.println("Error: ya existe un cliente con DNI " + dni);
-            return; // No se agrega ni guarda
+            return;
         }
 
         //Genera instancia
@@ -47,7 +48,7 @@ public class Modelo {
         }
     }
 
-    public void generarArtículo(String nombre, String precio){
+    public void generarArticulo(String nombre, String precio){
 
         //Comprueba que no exista ya un artículo con el mismo nombre
 
@@ -83,47 +84,57 @@ public class Modelo {
     public void generarFactura(String fecha, String dniCliente,
                                ArrayList<String> productos, ArrayList<Integer> cantidades) {
 
-        // Obtener cliente
         Cliente cliente = obtenerCliente(dniCliente);
         if (cliente == null) {
             System.out.println("No se puede generar la factura. Cliente no encontrado.");
             return;
         }
 
-        // Crear instancia de factura
         Factura factura = new Factura(fecha, cliente);
 
-        // Crear líneas de factura (máximo 10)
         ArrayList<LineaFacturas> lineas = new ArrayList<>();
+
         for (int i = 0; i < productos.size() && i < 10; i++) {
+
             String nombreProducto = productos.get(i);
             int cantidad = cantidades.get(i);
 
             Articulo articulo = obtenerArticulo(nombreProducto);
+
             if (articulo != null) {
                 LineaFacturas linea = new LineaFacturas(articulo, cantidad);
                 factura.agregarLineaFactura(linea);
-                lineas.add(linea);  // Para escribir en archivo separado
+                lineas.add(linea);
             } else {
                 System.out.println("El producto '" + nombreProducto + "' no se encontró en el sistema.");
             }
         }
 
-        // Guardar info general en facturas.txt
         try (BufferedWriter writer = new BufferedWriter(new FileWriter("facturas.txt", true))) {
-            writer.write(factura.getNumeroFactura() + ";" + fecha + ";" + cliente.getNombre() + ";" + cliente.getDni() +";"+factura.getIva());
+            writer.write(
+                    factura.getNumeroFactura() + ";" +
+                            fecha + ";" +
+                            cliente.getNombre() + ";" +
+                            cliente.getDni() + ";" +
+                            factura.getIva() + ";" +
+                            factura.getPrecioTotal() + ";" +
+                            factura.getPrecioFinal()
+            );
             writer.newLine();
         } catch (IOException e) {
             System.out.println("Error al guardar la factura: " + e.getMessage());
         }
 
-        // Guardar info detallada en lineas_factura.txt
         try (BufferedWriter writer = new BufferedWriter(new FileWriter("lineas_factura.txt", true))) {
             for (LineaFacturas linea : lineas) {
                 Articulo art = linea.getArticulo();
-                // Guardamos código de factura para relacionarlo
-                writer.write(factura.getNumeroFactura() + ";" + art.getCodigoArticulo() + ";" + art.getNombre() + ";" +
-                        linea.getCantidadArtículo() + ";" + linea.calcularCantidadPrecio());
+                writer.write(
+                        factura.getNumeroFactura() + ";" +
+                                art.getCodigoArticulo() + ";" +
+                                art.getNombre() + ";" +
+                                linea.getCantidadArtículo() + ";" +
+                                linea.calcularCantidadPrecio()
+                );
                 writer.newLine();
             }
         } catch (IOException e) {
@@ -196,25 +207,34 @@ public class Modelo {
     }
 
     public String[] consultarFacturas(String numeroFactura) {
-        int facturaConsultada = Integer.parseInt(numeroFactura);
+
+        int facturaConsultada;
+        try {
+            facturaConsultada = Integer.parseInt(numeroFactura);
+        } catch (NumberFormatException e) {
+            System.out.println("Número de factura inválido.");
+            return null;
+        }
+
         for (Factura f : facturasList) {
             if (f.getNumeroFactura() == facturaConsultada) {
-                System.out.println("Artículo encontrado");
-                // Devolvemos un array con todos los datos
-                String numeroConsultado = String.valueOf(f.getNumeroFactura());
-                String ivaConsultado = String.valueOf(f.getIva());
-                String precioConsultado = String.valueOf(f.getPrecioFinal());
+
+                f.recalcularTotales();
+
+                System.out.println("Factura encontrada");
+
                 return new String[] {
-                        numeroConsultado,
+                        String.valueOf(f.getNumeroFactura()),
                         f.getFecha(),
                         f.getDniCliente(),
-                        ivaConsultado,
-                        precioConsultado
+                        String.valueOf(f.getIva()),
+                        String.valueOf(f.getPrecioFinal())
                 };
             }
         }
-        System.out.println("Artículo no encontrado");
-        return null; // Retornamos null si no se encuentra
+
+        System.out.println("Factura no encontrada");
+        return null;
     }
 
 
@@ -270,6 +290,102 @@ public class Modelo {
             System.out.println("Artículos cargados: " + articulosList.size());
         } catch (IOException e) {
             System.out.println("Error leyendo artículos: " + e.getMessage());
+        }
+
+        facturasList.clear();
+
+        try (BufferedReader reader = new BufferedReader(new FileReader("facturas.txt"))) {
+            String linea;
+            while ((linea = reader.readLine()) != null) {
+
+                String[] datos = linea.split(";");
+
+                if (datos.length == 7) {
+
+                    int numeroFactura = Integer.parseInt(datos[0]);
+                    String fecha = datos[1];
+                    String dniCliente = datos[3];
+                    int iva = Integer.parseInt(datos[4]);
+
+                    Cliente cliente = obtenerCliente(dniCliente);
+
+                    if (cliente != null) {
+
+                        // Crear factura con tu constructor
+                        Factura factura = new Factura(fecha, cliente);
+
+                        // Forzar el número de factura del archivo
+                        try {
+                            Field fieldNumero = Factura.class.getDeclaredField("numeroFactura");
+                            fieldNumero.setAccessible(true);
+                            fieldNumero.setInt(factura, numeroFactura);
+
+                            Field fieldIVA = Factura.class.getDeclaredField("iva");
+                            fieldIVA.setAccessible(true);
+                            fieldIVA.setInt(factura, iva);
+
+                        } catch (Exception e) {
+                            System.out.println("Error asignando número de factura original: " + e.getMessage());
+                        }
+
+                        facturasList.add(factura);
+                    }
+                }
+            }
+            System.out.println("Facturas cargadas: " + facturasList.size());
+
+        } catch (IOException e) {
+            System.out.println("Error cargando facturas: " + e.getMessage());
+        }
+
+        // CARGA LÍNEAS DE FACTURAS
+
+        try (BufferedReader reader = new BufferedReader(new FileReader("lineas_factura.txt"))) {
+            String linea;
+            while ((linea = reader.readLine()) != null) {
+
+                String[] datos = linea.split(";");
+
+                if (datos.length == 5) {
+
+                    int numeroFacturaArchivo = Integer.parseInt(datos[0]);
+                    String nombreArticulo = datos[2];
+                    int cantidad = Integer.parseInt(datos[3]);
+
+                    // Buscar la factura correspondiente
+                    Factura factura = null;
+                    for (Factura f : facturasList) {
+                        if (f.getNumeroFactura() == numeroFacturaArchivo) {
+                            factura = f;
+                            break;
+                        }
+                    }
+
+                    if (factura == null)
+                        continue; // la factura no existe → no cargamos su línea
+
+                    // Buscar artículo por nombre
+                    Articulo articulo = obtenerArticulo(nombreArticulo);
+                    if (articulo == null)
+                        continue;
+
+                    // Crear línea
+                    LineaFacturas lineaFactura = new LineaFacturas(articulo, cantidad);
+
+                    // Añadirla a la factura
+                    factura.agregarLineaFactura(lineaFactura);
+                }
+            }
+
+            // Después de cargar todas las líneas, recalculamos totales
+            for (Factura f : facturasList) {
+                f.recalcularTotales();
+            }
+
+            System.out.println("Líneas de facturas cargadas correctamente.");
+
+        } catch (IOException e) {
+            System.out.println("Error cargando líneas: " + e.getMessage());
         }
 
     }

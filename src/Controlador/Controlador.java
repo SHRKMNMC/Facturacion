@@ -67,8 +67,8 @@ public class Controlador {
 
                         switch (seleccionMenuArtículos) {
 
-                            case 1 -> añadirArtículo();       //CREAR CLIENTE
-                            case 2 -> consultarArtículo();   //CONSULTAR CLIENTE POR DNI
+                            case 1 -> añadirArticulo();       //CREAR CLIENTE
+                            case 2 -> consultarArticulo();   //CONSULTAR CLIENTE POR DNI
                             case 3 -> mostrarListaArticulos();       //MOSTRAR FICHERO ARTICULOS.TXT
                             case 4 -> {
                                 System.out.println("Volviendo...");
@@ -90,9 +90,9 @@ public class Controlador {
                         switch (seleccionMenuFacturas) {
 
                             case 1 -> crearFactura(); // NUEVA FACTURA
-                            case 2 -> System.out.println("Consultar facturas");
-                            case 3 -> vista.mostrarFicheroFacturas();
-                            case 4 -> vista.mostrarFicheroLineasFacturas();//CREAR CLIENTE
+                            case 2 -> consultarFactura(); //CONSULTAR FACTURA POR NÚMERO
+                            case 3 -> vista.mostrarFicheroFacturas(); //FICHERO FACTURAS
+                            case 4 -> vista.mostrarFicheroLineasFacturas(); //FICHERO LINEAS
                             case 5 -> {
                                 System.out.println("Volviendo...");
                                 salidaMenuArtículos = true;
@@ -118,8 +118,11 @@ public class Controlador {
 
         String[] datos = vista.datosNuevoCliente();
 
-        modelo.generarCliente(datos[0],datos[1],datos[2],datos[3],datos[4],datos[5],datos[6]);
-
+        if (datos != null) {
+            modelo.generarCliente(datos[0], datos[1], datos[2], datos[3], datos[4], datos[5], datos[6]);
+        } else {
+            System.out.println("Operación de creación de cliente cancelada.");
+        }
     }
 
     public void mostrarListaClientes(){
@@ -147,12 +150,15 @@ public class Controlador {
 
     //METODOS MENU ARTÍCULOS
 
-    public void añadirArtículo(){
+    public void añadirArticulo(){
 
         String[] datos = vista.datosNuevoArticulo();
 
-        modelo.generarArtículo(datos[0],datos[1]);
-
+        if(datos != null){
+            modelo.generarArticulo(datos[0],datos[1]);
+        }else {
+            System.out.println("Operación de creación de cliente cancelada.");
+        }
     }
 
     public void mostrarListaArticulos(){
@@ -166,25 +172,13 @@ public class Controlador {
 
     }
 
-    public void consultarArtículo(){
+    public void consultarArticulo(){
         int salidaConsultas = 0;
         do {
             System.out.println("Introduzca nombre del artículo a consultar");
             String nombreArticulo = vista.leerString(0,40);
             String[] datosConsulta = modelo.consultarArtículo(nombreArticulo);
             vista.mostrarArtículo(datosConsulta);
-            System.out.println("Introduzca 1 para salir");
-            salidaConsultas = vista.leerOpcionMenu(1,1);
-        }while (salidaConsultas != 1);
-    }
-
-    public void consultarFactura(){
-        int salidaConsultas = 0;
-        do {
-            System.out.println("Introduzca numero de la factura a consultar");
-            String numeroFactura = vista.leerString(0,40);
-            String[] datosConsulta = modelo.consultarFacturas(numeroFactura);
-            vista.mostrarFactura(datosConsulta);
             System.out.println("Introduzca 1 para salir");
             salidaConsultas = vista.leerOpcionMenu(1,1);
         }while (salidaConsultas != 1);
@@ -275,6 +269,18 @@ public class Controlador {
             }
 
         } while (salidaCreacionFacturas);
+    }
+
+    public void consultarFactura(){
+        int salidaConsultas = 0;
+        do {
+            System.out.println("Introduzca numero de la factura a consultar");
+            String numeroFactura = vista.leerString(0,40);
+            String[] datosConsulta = modelo.consultarFacturas(numeroFactura);
+            vista.mostrarFactura(datosConsulta);
+            System.out.println("Introduzca 1 para salir");
+            salidaConsultas = vista.leerOpcionMenu(1,1);
+        }while (salidaConsultas != 1);
     }
 
 }

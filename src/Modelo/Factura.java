@@ -2,7 +2,8 @@ package Modelo;
 
 public class Factura {
 
-    private static int numeroFactura = 1000;
+    private int numeroFactura = 1000;
+    private static int contadorFacturas = 0;
     private String fecha;
     private Cliente cliente;
     private String dniCliente;
@@ -13,83 +14,83 @@ public class Factura {
     private int iva;
     private double precioFinal;
 
-    public Factura (String fecha, Cliente cliente){
-        this.numeroFactura = numeroFactura;
-        numeroFactura++;
+    public Factura(String fecha, Cliente cliente) {
+        this.numeroFactura = numeroFactura + contadorFacturas;
+        contadorFacturas++;
+
         this.fecha = fecha;
         this.iva = 21;
         this.cliente = cliente;
-        this.lineasFacturas = new LineaFacturas[MAX_LINEAS_FACTURAS];
         this.dniCliente = cliente.getDni();
-        this.precioTotal = sumarLineasFacturas();
-        this.precioFinal = calcularPrecioFinal();
+        this.lineasFacturas = new LineaFacturas[MAX_LINEAS_FACTURAS];
+        this.precioTotal = 0;
+        this.precioFinal = 0;
     }
 
-    public int getNumeroFactura(){
+    public int getNumeroFactura() {
         return numeroFactura;
     }
 
-    public String getFecha(){
+    public String getFecha() {
         return fecha;
     }
 
-    public String getDniCliente(){
+    public String getDniCliente() {
         return dniCliente;
     }
 
-    public double getPrecioTotal(){
+    public double getPrecioTotal() {
         return precioTotal;
     }
 
-    public double getIva(){
+    public int getIva() {
         return iva;
     }
 
-    public double getPrecioFinal(){
+    public double getPrecioFinal() {
         return precioFinal;
     }
 
+    public void recalcularTotales() {
+        precioTotal = sumarLineasFacturas();
+        precioFinal = calcularPrecioFinal();
+    }
 
-
-    public double sumarLineasFacturas(){
-
+    public double sumarLineasFacturas() {
         double total = 0;
 
         for (int i = 0; i < cantidadLineasFacturas; i++) {
-            total = total + lineasFacturas[i].calcularCantidadPrecio();
+            total += lineasFacturas[i].calcularCantidadPrecio();
         }
-
         return total;
-
     }
 
-    public double calcularPrecioFinal(){
-
-        precioFinal = precioTotal + (precioTotal*iva)/100;
-
-        return precioFinal;
+    public double calcularPrecioFinal() {
+        return precioTotal + (precioTotal * iva) / 100;
     }
 
-    public void agregarLineaFactura(LineaFacturas lineaFacturas){
-
-        if (cantidadLineasFacturas<MAX_LINEAS_FACTURAS){
+    public void agregarLineaFactura(LineaFacturas lineaFacturas) {
+        if (cantidadLineasFacturas < MAX_LINEAS_FACTURAS) {
             lineasFacturas[cantidadLineasFacturas] = lineaFacturas;
             cantidadLineasFacturas++;
+
+            recalcularTotales();
         }
     }
 
-    public void MostrarInfo(){
+    public void MostrarInfo() {
         System.out.println("---------------------------------");
-        System.out.println("Número de factura: "+numeroFactura+"\nFecha: "+fecha +"\nCif Cliente: "+dniCliente);
+        System.out.println("Número de factura: " + numeroFactura +
+                "\nFecha: " + fecha +
+                "\nCif Cliente: " + dniCliente);
         System.out.println();
         System.out.println("Desglose de la compra: ");
         System.out.println();
         System.out.println("   Código de artículo   |   Descripción   |   Cantidad   |   Precio   ");
-        for (int i=0;i<cantidadLineasFacturas;i++){
+        for (int i = 0; i < cantidadLineasFacturas; i++) {
             lineasFacturas[i].mostrarInfo();
             System.out.println();
         }
         System.out.println("---------------------------------");
-
     }
 }

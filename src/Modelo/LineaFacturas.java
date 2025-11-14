@@ -5,27 +5,27 @@ public class LineaFacturas {
     private Articulo articulo;
     private int cantidadArtículo;
 
-    public LineaFacturas (Articulo articulo, int cantidadArtículo){
+    public LineaFacturas(Articulo articulo, int cantidadArtículo) {
         this.articulo = articulo;
         this.cantidadArtículo = cantidadArtículo;
     }
 
-
-    public double calcularCantidadPrecio(){
-        double cantidadPrecio = cantidadArtículo*articulo.getPrecio();
-        return cantidadPrecio;
+    public double calcularCantidadPrecio() {
+        return cantidadArtículo * articulo.getPrecio();
     }
 
-    public Articulo getArticulo(){
+    public Articulo getArticulo() {
         return articulo;
     }
 
-    public int getCantidadArtículo(){
+    public int getCantidadArtículo() {
         return cantidadArtículo;
     }
 
-    public void mostrarInfo(){
-
-        System.out.println("         "+articulo.getCodigoArticulo()+"          | "+articulo.getNombre()+" |        "+cantidadArtículo+"        |   "+calcularCantidadPrecio()+"   ");
+    public void mostrarInfo() {
+        System.out.println("         " + articulo.getCodigoArticulo() +
+                "          | " + articulo.getNombre() +
+                " |        " + cantidadArtículo +
+                "        |   " + calcularCantidadPrecio() + "   ");
     }
 }

@@ -80,100 +80,112 @@ public class Vista {
 
     //METODOS PARA RECOPILAR DATOS DE CLIENTES
 
-    public String[] datosNuevoCliente(){
+    public String[] datosNuevoCliente() {
 
         String[] datos = new String[7];
-
         int confirmar = 0;
 
         do {
-
             //NOMBRE
-            System.out.println("Introduzca nombre completo:");
-            datos[0] = leerString(1,40);
+            System.out.println("Introduzca nombre completo (o 'OUT' para salir):");
+            datos[0] = leerString(1, 40);
+            if (datos[0].equalsIgnoreCase("OUT")) return null;
 
             //DNI
-            System.out.println("Introduzca DNI:");
-            datos[1] = leerString(9,9);
+            System.out.println("Introduzca DNI (o 'OUT' para salir):");
+            datos[1] = leerString(9, 9);
+            if (datos[1].equalsIgnoreCase("OUT")) return null;
 
             //POBLACION
-            System.out.println("Población:");
-            datos[2]= leerString(1,20);
+            System.out.println("Población (o 'CANCELAR' para salir):");
+            datos[2] = leerString(1, 20);
+            if (datos[2].equalsIgnoreCase("OUT")) return null;
 
             //DIRECCION
-            System.out.println("Dirección:");
-            datos[3] = leerString(1,40);
+            System.out.println("Dirección (o 'CANCELAR' para salir):");
+            datos[3] = leerString(1, 40);
+            if (datos[3].equalsIgnoreCase("OUT")) return null;
 
             //CODIGO POSTAL
-            System.out.println("Código postal:");
-            datos[4] = leerString(5,5);
+            System.out.println("Código postal (o 'OUT' para salir):");
+            datos[4] = leerString(5, 5);
+            if (datos[4].equalsIgnoreCase("CANCELAR")) return null;
 
             //PROVINCIA
-            System.out.println("Provincia:");
-            datos[5]= leerString(1,20);
+            System.out.println("Provincia (o 'OUT' para salir):");
+            datos[5] = leerString(1, 20);
+            if (datos[5].equalsIgnoreCase("OUT")) return null;
 
             //TELEFONO
-            System.out.println("Número de teléfono:");
-            datos[6] = leerString(9,9);
+            System.out.println("Número de teléfono (o 'OUT' para salir):");
+            datos[6] = leerString(9, 9);
+            if (datos[6].equalsIgnoreCase("OUT")) return null;
 
+            // Mostrar datos
             System.out.println("|||||| Datos introducidos |||||| ");
-            System.out.println("|");
-            System.out.println("|Nombre: "+ datos[0]);
-            System.out.println("|DNI: "+datos[1]);
-            System.out.println("|Población: "+datos[2]);
-            System.out.println("|Dirección: "+datos[3]);
-            System.out.println("|Código postal: "+datos[4]);
-            System.out.println("|Provincia: "+datos[5]);
-            System.out.println("|Teléfono: "+datos[6]);
+            System.out.println("|Nombre: " + datos[0]);
+            System.out.println("|DNI: " + datos[1]);
+            System.out.println("|Población: " + datos[2]);
+            System.out.println("|Dirección: " + datos[3]);
+            System.out.println("|Código postal: " + datos[4]);
+            System.out.println("|Provincia: " + datos[5]);
+            System.out.println("|Teléfono: " + datos[6]);
             System.out.println("|______________________________");
-            System.out.println("Introduzca 1 para confirmar datos, 2 para repetir");
+            System.out.println("Introduzca 1 para confirmar datos, 2 para repetir, 0 para cancelar");
 
-            confirmar = leerOpcionMenu(1,2);
+            confirmar = leerOpcionMenu(0, 2);
 
-            if (confirmar == 2){
+            if (confirmar == 2) {
                 System.out.println("Repitiendo operación...");
+            } else if (confirmar == 0) {
+                return null;
             }
 
-        }while (confirmar !=1);
+        } while (confirmar != 1);
 
         return datos;
     }
+
 
     //METODO PARA RECOPILAR DATOS DEL ARTÍCULO
 
-    public String[] datosNuevoArticulo(){
+    public String[] datosNuevoArticulo() {
 
         String[] datos = new String[2];
-
         int confirmar = 0;
 
         do {
+            // NOMBRE
+            System.out.println("Introduzca nombre del producto (o 'OUT' para salir):");
+            datos[0] = leerString(1, 40);
+            if (datos[0].equalsIgnoreCase("OUT")) return null;
 
-            //NOMBRE
-            System.out.println("Introduzca nombre del producto:");
-            datos[0] = leerString(1,40);
+            // PRECIO
+            System.out.println("Introduzca precio del producto (o 'OUT' para salir):");
+            String precioStr = leerStringToDouble(1, 6); // asumimos que devuelve String
+            if (precioStr.equalsIgnoreCase("OUT")) return null;
+            datos[1] = precioStr;
 
-            //PRECIO
-            System.out.println("Introduzca precio del producto");
-            datos[1] = leerStringToDouble(1,6);
-
+            // Mostrar datos
             System.out.println("|||||| Datos introducidos |||||| ");
-            System.out.println("|");
-            System.out.println("|Nombre: "+ datos[0]);
-            System.out.println("|Precio: "+datos[1]);
+            System.out.println("|Nombre: " + datos[0]);
+            System.out.println("|Precio: " + datos[1]);
             System.out.println("|______________________________");
-            System.out.println("Introduzca 1 para confirmar datos, 2 para repetir");
+            System.out.println("Introduzca 1 para confirmar datos, 2 para repetir, 0 para cancelar");
 
-            confirmar = leerOpcionMenu(1,2);
+            confirmar = leerOpcionMenu(0, 2);
 
-            if (confirmar == 2){
+            if (confirmar == 2) {
                 System.out.println("Repitiendo operación...");
+            } else if (confirmar == 0) {
+                return null;
             }
 
-        }while (confirmar !=1);
+        } while (confirmar != 1);
 
         return datos;
     }
+
 
     //METODO PARA MOSTRAR CLIENTE CONCRETO EN CONSOLA
 
