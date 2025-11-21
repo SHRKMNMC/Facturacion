@@ -1,0 +1,559 @@
+package Vista;
+
+import java.io.*;
+import java.util.Scanner;
+
+public class Vista {
+
+    //SCANNER GLOBAL PARA TODOS LOS INPUTS DE VISTA
+
+    private final Scanner scanner;
+
+    public Vista (Scanner scanner){
+        this.scanner = scanner;
+    }
+
+    //MENU PRINCIPAL
+
+    public void mostrarMenu(){
+
+            System.out.println("===============================================");
+            System.out.println();
+            System.out.println("            1. Gestión de Clientes             ");
+            System.out.println("            2. Gestión de Artículos            ");
+            System.out.println("            3. Gestión de Facturas             ");
+            System.out.println("            4. Configuración                   ");
+            System.out.println("            5. Salir                           ");
+            System.out.println();
+            System.out.println("   Introduzca el número de la opción deseada   ");
+            System.out.println();
+            System.out.println("===============================================");
+    }
+
+    //MENUS CLIENTES, ARTÍCULOS
+
+    public void menuClientes(){
+
+        System.out.println("===============================================");
+        System.out.println();
+        System.out.println("            1. Añadir Cliente                  ");
+        System.out.println("            2. Consultar Cliente               ");
+        System.out.println("            3. Lista de Clientes               ");
+        System.out.println("            4. Salir                           ");
+        System.out.println();
+        System.out.println("   Introduzca el número de la opción deseada   ");
+        System.out.println();
+        System.out.println("===============================================");
+    }
+
+    public void menuArtículos(){
+
+        System.out.println("===============================================");
+        System.out.println();
+        System.out.println("            1. Añadir Artículo                 ");
+        System.out.println("            2. Consultar Artículo              ");
+        System.out.println("            3. Lista de Artículos              ");
+        System.out.println("            4. Salir                           ");
+        System.out.println();
+        System.out.println("   Introduzca el número de la opción deseada   ");
+        System.out.println();
+        System.out.println("===============================================");
+    }
+
+    public void menuFacturas(){
+        System.out.println("===============================================");
+        System.out.println();
+        System.out.println("            1. Nueva Factura                   ");
+        System.out.println("            2. Consultar Facturas              ");
+        System.out.println("            3. Lista de Facturas               ");
+        System.out.println("            4. Lista de Lineas de facturas     ");
+        System.out.println("            5. Salir                           ");
+        System.out.println();
+        System.out.println("   Introduzca el número de la opción deseada   ");
+        System.out.println();
+        System.out.println("===============================================");
+    }
+
+    //MENU CONFIGURACION
+
+    public void menuConfiguración(){
+        System.out.println("===============================================");
+        System.out.println();
+        System.out.println("            1. Configurar IVA                  ");
+        System.out.println("            2. Consultar IVA actual            ");
+        System.out.println("            3. Salir                           ");
+        System.out.println();
+        System.out.println("   Introduzca el número de la opción deseada   ");
+        System.out.println();
+        System.out.println("===============================================");
+    }
+
+    //METODO PARA RECOPILAR DATOS DE CLIENTES
+
+    public String[] datosNuevoCliente() {
+
+        String[] datos = new String[7];
+        int confirmar = 0;
+
+        do {
+            //NOMBRE
+            System.out.println("Introduzca nombre completo (o 'OUT' para salir):");
+            datos[0] = leerString(1, 40);
+            if (datos[0].equalsIgnoreCase("OUT")) return null;
+
+            //DNI
+            System.out.println("Introduzca DNI (o 'OUT' para salir):");
+            datos[1] = leerString(9, 9);
+            if (datos[1].equalsIgnoreCase("OUT")) return null;
+
+            //POBLACION
+            System.out.println("Población (o 'OUT' para salir):");
+            datos[2] = leerString(1, 20);
+            if (datos[2].equalsIgnoreCase("OUT")) return null;
+
+            //DIRECCION
+            System.out.println("Dirección (o 'OUT' para salir):");
+            datos[3] = leerString(1, 40);
+            if (datos[3].equalsIgnoreCase("OUT")) return null;
+
+            //CODIGO POSTAL
+            System.out.println("Código postal (o 'OUT' para salir):");
+            datos[4] = leerString(5, 5);
+            if (datos[4].equalsIgnoreCase("CANCELAR")) return null;
+
+            //PROVINCIA
+            System.out.println("Provincia (o 'OUT' para salir):");
+            datos[5] = leerString(1, 20);
+            if (datos[5].equalsIgnoreCase("OUT")) return null;
+
+            //TELEFONO
+            System.out.println("Número de teléfono (o 'OUT' para salir):");
+            datos[6] = leerString(9, 9);
+            if (datos[6].equalsIgnoreCase("OUT")) return null;
+
+            // Mostrar datos
+            System.out.println("|||||| Datos introducidos |||||| ");
+            System.out.println("|Nombre: " + datos[0]);
+            System.out.println("|DNI: " + datos[1]);
+            System.out.println("|Población: " + datos[2]);
+            System.out.println("|Dirección: " + datos[3]);
+            System.out.println("|Código postal: " + datos[4]);
+            System.out.println("|Provincia: " + datos[5]);
+            System.out.println("|Teléfono: " + datos[6]);
+            System.out.println("|______________________________");
+            System.out.println("Introduzca 1 para confirmar datos, 2 para repetir, 0 para cancelar");
+
+            confirmar = leerOpcionMenu(0, 2);
+
+            if (confirmar == 2) {
+                System.out.println("Repitiendo operación...");
+            } else if (confirmar == 0) {
+                return null;
+            }
+
+        } while (confirmar != 1);
+
+        return datos;
+    }
+
+
+    //METODO PARA RECOPILAR DATOS DEL ARTÍCULO
+
+    public String[] datosNuevoArticulo() {
+
+        String[] datos = new String[2];
+        int confirmar = 0;
+
+        do {
+            // NOMBRE
+            System.out.println("Introduzca nombre del producto (o 'OUT' para salir):");
+            datos[0] = leerString(1, 40);
+            if (datos[0].equalsIgnoreCase("OUT")) return null;
+
+            // PRECIO
+            System.out.println("Introduzca precio del producto (o 'OUT' para salir):");
+            String precioStr = leerStringToDouble(1, 6); // asumimos que devuelve String
+            if (precioStr.equalsIgnoreCase("OUT")) return null;
+            datos[1] = precioStr;
+
+            // Mostrar datos
+            System.out.println("|||||| Datos introducidos |||||| ");
+            System.out.println("|Nombre: " + datos[0]);
+            System.out.println("|Precio: " + datos[1]);
+            System.out.println("|______________________________");
+            System.out.println("Introduzca 1 para confirmar datos, 2 para repetir, 0 para cancelar");
+
+            confirmar = leerOpcionMenu(0, 2);
+
+            if (confirmar == 2) {
+                System.out.println("Repitiendo operación...");
+            } else if (confirmar == 0) {
+                return null;
+            }
+
+        } while (confirmar != 1);
+
+        return datos;
+    }
+
+
+    //METODO PARA MOSTRAR CLIENTE CONCRETO EN CONSOLA
+
+    public void mostrarCliente(String[] datosClienteConsultado) {
+        if (datosClienteConsultado == null) {
+            System.out.println("Cliente no encontrado.");
+            return;
+        }
+
+        String[] campos = {"Nombre", "DNI", "Población", "Dirección", "Código Postal", "Provincia", "Teléfono"};
+
+        for (int i = 0; i < campos.length; i++) {
+            System.out.println(campos[i] + ": " + datosClienteConsultado[i]);
+        }
+    }
+
+    //METODO PARA MOSTRAR LOS CLIENTES ACTUALES
+
+    public void mostrarFicheroClientes() {
+
+        int salidaFichero = 0;
+
+        do {
+            System.out.println("======= Lista de clientes =======");
+
+            try (BufferedReader reader = new BufferedReader(new FileReader("clientes.txt"))) {
+
+                String linea;
+
+                // Anchuras de columnas (ajustables)
+                int wNombre    = 40;
+                int wDni       = 9;
+                int wPoblacion = 20;
+                int wDireccion = 40;
+                int wCP        = 5;
+                int wProvincia = 20;
+                int wTelefono  = 9;
+
+                // Cabecera de la tabla
+                System.out.printf("| %-" + wNombre + "s | %-" + wDni + "s | %-" + wPoblacion + "s | %-" + wDireccion + "s | %-" + wCP + "s | %-" + wProvincia + "s | %-" + wTelefono + "s |\n",
+                        "Nombre", "DNI", "Población", "Dirección", "C.P", "Provincia", "Teléfono");
+
+                System.out.println("----------------------------------------------------------------------------------------------------------------------------------");
+
+                // Imprimir datos del fichero
+                while ((linea = reader.readLine()) != null) {
+
+                    String[] datos = linea.split(";");
+
+                    if (datos.length < 7) continue;  // Seguridad
+
+                    String nombre     = datos[0];
+                    String dni        = datos[1];
+                    String poblacion  = datos[2];
+                    String direccion  = datos[3];
+                    String cp         = datos[4];
+                    String provincia  = datos[5];
+                    String telefono   = datos[6];
+
+                    System.out.printf("| %-" + wNombre + "s | %-" + wDni + "s | %-" + wPoblacion + "s | %-" + wDireccion + "s | %-" + wCP + "s | %-" + wProvincia + "s | %-" + wTelefono + "s |\n",
+                            nombre, dni, poblacion, direccion, cp, provincia, telefono);
+                }
+
+            } catch (IOException e) {
+                System.out.println("Error al leer el fichero: " + e.getMessage());
+            }
+
+            System.out.println("================================");
+            System.out.println("Introduzca 1 para salir.");
+            salidaFichero = leerOpcionMenu(1, 1);
+
+        } while (salidaFichero != 1);
+    }
+
+
+    //METODO PARA MOSTRAR LAS FACTURAS GUARDADAS
+
+    public void mostrarFicheroFacturas() {
+
+        int salidaFichero = 0;
+
+        do {
+            System.out.println("====== Facturas guardadas =======");
+
+            try (BufferedReader reader = new BufferedReader(new FileReader("facturas.txt"))) {
+
+                String linea;
+
+                int wNum = 12;
+                int wFecha = 12;
+                int wNombre = 40;
+                int wDni = 9;
+                int wIVA = 6;
+
+                System.out.printf("| %-" + wNum + "s | %-" + wFecha + "s | %-" + wNombre + "s | %-" + wDni + "s | %-" + wIVA + "s |\n",
+                        "Nº Factura", "Fecha", "Cliente", "DNI", "IVA");
+                System.out.println("--------------------------------------------------------------------------------------------");
+
+                while ((linea = reader.readLine()) != null) {
+
+                    String[] datos = linea.split(";");
+
+                    if (datos.length < 5) continue; // seguridad
+
+                    String numFactura = datos[0];
+                    String fecha = datos[1];
+                    String nombreCliente = datos[2];
+                    String dni = datos[3];
+                    String iva = datos[4];
+
+                    System.out.printf("| %-" + wNum + "s | %-" + wFecha + "s | %-" + wNombre + "s | %-" + wDni + "s | %-" + wIVA + "s |\n",
+                            numFactura, fecha, nombreCliente, dni, iva);
+                }
+
+            } catch (IOException e) {
+                System.out.println("Error al leer el fichero: " + e.getMessage());
+            }
+
+            System.out.println("================================");
+            System.out.println("Introduzca 1 para salir.");
+            salidaFichero = leerOpcionMenu(1, 1);
+
+        } while (salidaFichero != 1);
+    }
+
+
+    //METODO PARA MOSTRAR FACTURA CONCRETA
+
+    public void mostrarFactura(String[] datosFacturaConsultada) {
+        if (datosFacturaConsultada == null) {
+            System.out.println("Cliente no encontrado.");
+            return;
+        }
+
+        String[] campos = {"Número", "Fecha", "Cliente", "IVA aplicado", "Precio final"};
+
+        for (int i = 0; i < campos.length; i++) {
+            if (i == 4) {
+                try {
+                    double precio = Double.parseDouble(datosFacturaConsultada[i]);
+                    String precioFormateado = String.format("%.2f", precio);
+                    System.out.println(campos[i] + ": " + precioFormateado + " €");
+                    continue;
+                } catch (NumberFormatException e) {
+                }
+            } else if (i == 3) {
+                System.out.println(campos[i] + ": " + datosFacturaConsultada[i] + " %");
+                continue;
+            }
+
+            System.out.println(campos[i] + ": " + datosFacturaConsultada[i]);
+        }
+    }
+
+
+    //METODO PARA MOSTRAR LAS LINEAS DE FACTURA GUARDADAS
+
+    public void mostrarFicheroLineasFacturas() {
+
+        int salidaFichero = 0;
+
+        do {
+
+            System.out.println("Introduzca 1 para salir.");
+            salidaFichero = leerOpcionMenu(1,1);
+
+        } while (salidaFichero != 1);
+    }
+
+
+
+    //METODO PARA MOSTRAR ARTÍCULO CONCRETO EN CONSOLA
+
+    public void mostrarArtículo(String[] datosArticuloConsultado) {
+        if (datosArticuloConsultado == null) {
+            System.out.println("Artículo no encontrado.");
+            return;
+        }
+
+        String[] campos = {"Nombre", "Precio"};
+
+        for (int i = 0; i < campos.length; i++) {
+            System.out.println(campos[i] + ": " + datosArticuloConsultado[i]);
+        }
+    }
+
+    //METODO PARA MOSTRAR LOS ARTÍCULOS ACTUALES
+
+    public void mostrarFicheroArticulos() {
+
+        int salidaFichero = 0;
+
+        do {
+            System.out.println("====== Lista de artículos ======");
+
+            try (BufferedReader reader = new BufferedReader(new FileReader("articulos.txt"))) {
+
+                String linea;
+
+                int wCodigo = 10;
+                int wNombre = 40;
+                int wPrecio = 10;
+
+                System.out.printf("| %-" + wCodigo + "s | %-" + wNombre + "s | %-" + wPrecio + "s |\n",
+                        "Código", "Nombre", "Precio");
+
+                System.out.println("-----------------------------------------------------------------------");
+
+                while ((linea = reader.readLine()) != null) {
+
+                    String[] datos = linea.split(";");
+
+                    if (datos.length < 3) continue;
+
+                    String codigo = datos[0];
+                    String nombre = datos[1];
+                    String precio = datos[2];
+
+                    System.out.printf("| %-" + wCodigo + "s | %-" + wNombre + "s | %-" + wPrecio + "s |\n",
+                            codigo, nombre, precio);
+                }
+
+            } catch (IOException e) {
+                System.out.println("Error al leer el fichero: " + e.getMessage());
+            }
+
+            System.out.println("================================");
+            System.out.println("Introduzca 1 para salir.");
+            salidaFichero = leerOpcionMenu(1, 1);
+
+        } while (salidaFichero != 1);
+    }
+
+
+    //METODO PARA CONTROLAR INPUTS NUMÉRICOS DE LOS MENUS
+
+    public int leerOpcionMenu(int min, int max) {
+        while (true) {
+            String input = scanner.nextLine().trim();
+            try {
+                int numero = Integer.parseInt(input);
+                if (numero < min || numero > max) {
+                    System.out.print("Opción fuera de rango, intente de nuevo: ");
+                    continue;
+                }
+                return numero;
+            } catch (NumberFormatException e) {
+                System.out.print("Entrada no válida. Introduzca un número: ");
+            }
+        }
+    }
+
+    //METODO PARA CONTROLAR INPUTS QUE SEAN STRING
+
+    public String leerString(int min, int max) {
+        while (true) {
+            String input = scanner.nextLine().trim();
+            if (input.contains(";")) {
+                System.out.print("Entrada no válida: no se permiten ';'. Intente de nuevo: ");
+                continue;
+            }
+            if (input.length() < min || input.length() > max) {
+                System.out.print("Longitud inválida (Mínimo " + min + "- Máximo " + max + "). Intente de nuevo: ");
+                continue;
+            }
+            return input;
+        }
+    }
+
+    //METODO PARA COMPROBAR Y FORZAR LA ENTRADA DE INPUT STRING Y QUE SEA UN VALOR NUMÉRICO (EJ.: EL PRECIO)
+
+    public String leerStringToDouble(int min, int max) {
+        while (true) {
+            System.out.print("Ingrese un precio: ");
+            String input = scanner.nextLine().trim();
+
+            // Valida que no contenga ';'
+            if (input.contains(";")) {
+                System.out.println("Entrada no válida: no se permiten ';'. Intente de nuevo.");
+                continue;
+            }
+
+            // Valida que se pueda convertir a double
+            double valor;
+            try {
+                valor = Double.parseDouble(input);
+            } catch (NumberFormatException e) {
+                System.out.println("Entrada no válida: debe ser un número. Intente de nuevo.");
+                continue;
+            }
+
+            // Valida longitud del string original
+            if (input.length() < min || input.length() > max) {
+                System.out.println("Longitud inválida (Mínimo " + min + " - Máximo " + max + "). Intente de nuevo.");
+                continue;
+            }
+
+            // Valida que tenga máximo 2 decimales
+            if (input.contains(".")) {
+                String[] partes = input.split("\\.");
+                String decimales = partes.length > 1 ? partes[1] : "";
+                if (decimales.length() > 2) {
+                    System.out.println("Entrada no válida: el número no puede tener más de 2 decimales. Intente de nuevo.");
+                    continue;
+                }
+            }
+
+            // Si pasa todas las validaciones, lo devolvuelve como String
+            return input;
+        }
+    }
+
+    //METODO PARA CONTROLAR INPUT DE FECHA
+
+    public String leerFecha() {
+        int dia = 0, mes = 0, anio = 0;
+
+        while (true) {
+            try {
+                System.out.print("Introduce el día (1-31): ");
+                dia = Integer.parseInt(scanner.nextLine().trim());
+                if (dia < 1 || dia > 31) {
+                    System.out.println("Día inválido. Intente de nuevo.");
+                    continue;
+                }
+
+                System.out.print("Introduce el mes (1-12): ");
+                mes = Integer.parseInt(scanner.nextLine().trim());
+                if (mes < 1 || mes > 12) {
+                    System.out.println("Mes inválido. Intente de nuevo.");
+                    continue;
+                }
+
+                System.out.print("Introduce el año (por ejemplo 2025): ");
+                anio = Integer.parseInt(scanner.nextLine().trim());
+                if (anio < 2025 || anio > 2100) {
+                    System.out.println("Año inválido. Intente de nuevo.");
+                    continue;
+                }
+
+                // Validar que el día sea válido para el mes (sin años bisiestos por simplicidad)
+                if ((mes == 4 || mes == 6 || mes == 9 || mes == 11) && dia > 30) {
+                    System.out.println("El mes seleccionado tiene máximo 30 días. Intente de nuevo.");
+                    continue;
+                } else if (mes == 2 && dia > 29) { // Febrero simplificado
+                    System.out.println("Febrero tiene máximo 29 días. Intente de nuevo.");
+                    continue;
+                }
+
+                //Formateo
+                return String.format("%02d-%02d-%04d", dia, mes, anio);
+
+            } catch (NumberFormatException e) {
+                System.out.println("Entrada inválida, debe ser un número. Intente de nuevo.");
+            }
+        }
+    }
+
+
+}
+

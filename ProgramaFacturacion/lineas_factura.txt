@@ -1,0 +1,4 @@
+1000;RTCL0;bebida;2;3,20
+1000;RTCL0;bebida;3;4,80
+1001;RTCL0;bebida;6;9,60
+1001;RTCL0;bebida;7;11,20
